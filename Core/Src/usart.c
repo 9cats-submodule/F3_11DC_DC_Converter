@@ -23,6 +23,7 @@
 /* USER CODE BEGIN 0 */
 #include "cmd_queue.h"
 #include "cmd_process.h"
+#include "hmi_user_uart.h"
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -128,8 +129,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
      huart1.RxState = HAL_UART_STATE_READY;
      __HAL_UNLOCK(&huart1);
      queue_push(RxBuffer);
-     // Param_Update();//ÖĞ¶ÏÀïÃæ´¦ÀíÍêÖ¸Áî
-     SendChar(RxBuffer);
+     Param_Update();//ä¸­æ–­é‡Œé¢å¤„ç†å®ŒæŒ‡ä»¤
 		 HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
   }
 }

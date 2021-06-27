@@ -7,13 +7,22 @@
 #include "main.h"
 #include "gpio.h"
 
-// 定义可能会出现的兼容变量类型
-#define u32 uint32_t
-#define u16 uint16_t
-#define u8 uint8_t
-#define s32 int32_t
-#define s16 int16_t
-#define s8 int8_t
+// 定义可能会出现的兼容变量类型    
+#define u32    uint32_t
+#define u16    uint16_t
+#define u8     uint8_t
+#define s32    int32_t
+#define s16    int16_t
+#define s8     int8_t
+#define uint32 uint32_t
+#define uint16 uint16_t
+#define uint8  uint8_t
+#define int32  int32_t
+#define int16  int16_t
+#define int8   int8_t
+
+
+#define uchar  uint8_t
 
 // LED电平设置 0-亮 1-灭
 #define LED0(n) (n?HAL_GPIO_WritePin(LED0_GPIO_Port,LED0_Pin,GPIO_PIN_SET):HAL_GPIO_WritePin(LED0_GPIO_Port,LED0_Pin,GPIO_PIN_RESET))

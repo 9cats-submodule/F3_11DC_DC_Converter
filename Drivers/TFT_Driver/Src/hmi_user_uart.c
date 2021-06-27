@@ -3,7 +3,7 @@
 **                             http://www.gz-dc.com
 **-----------------------------------文件信息--------------------------------------------
 ** 文件名称:   hmi_user_uart.c
-** 修改时间:   2011-05-18
+** 修改时间:   2018-05-18
 ** 文件说明:   用户MCU串口驱动函数库
 ** 技术支持：  Tel: 020-82186683  Email: hmi@gz-dc.com Web:www.gz-dc.com
 --------------------------------------------------------------------------------------
@@ -42,6 +42,8 @@
 unsigned char RxBuffer;
 unsigned char TxBuffer;
 
+extern uint8 cmd_buffer[CMD_MAX_SIZE];     
+
 void TFT_Init(void)
 {
     HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);//使能接收中断
@@ -52,8 +54,8 @@ void Param_Update(void) //获取当前新参数
     qsize size = queue_find_cmd(cmd_buffer,CMD_MAX_SIZE);
     if(size)
     {
-        ProcessMessage((PCTRL_MSG)cmd_buffer, size);//指令处理
-        //LED1_T;
+			Process_Message((PCTRL_MSG)cmd_buffer, size);
+			//LED1_T;
     }
 }
 /*****************************************************************

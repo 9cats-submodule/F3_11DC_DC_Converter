@@ -33,6 +33,8 @@
 #include "w25qxx.h"
 #include "hmi_user_uart.h"
 #include "hmi_driver.h"
+#include "cmd_queue.h"
+#include "cmd_process.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +49,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+extern u8 cmd_buffer[];
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -114,6 +116,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		u8 size;
+		CTRL_MSG MSG = {0};
+		
+		size = queue_find_cmd(cmd_buffer,CMD_MAX_SIZE);
+		if(size>0&&cmd_buffer[1]!=0x07)
+    {
+		  Process_Message(&MSG, size); 
+		}
     delay_ms(50);
     key = KEY_Scan(0);
     if(key == KEY0_PRES)
