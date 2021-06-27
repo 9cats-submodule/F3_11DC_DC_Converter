@@ -20,11 +20,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stm32f1xx_hal_tim.h"
+
 #include "lcd.h"
 #include "touch.h"
 #include "w25qxx.h"
@@ -94,12 +97,14 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_USART1_UART_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   delay_init(72);
   LCD_Init();
   font_init();
   tp_dev.init();
   TFT_Init();
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -113,11 +118,13 @@ int main(void)
     key = KEY_Scan(0);
     if(key == KEY0_PRES)
     {
-	  SetButtonValue(3,1,0);
+			//SetButtonValue(3,1,0);
+			 __HAL_TIM_SET_AUTORELOAD(&htim1,720-1);
     }
     if(key == KEY1_PRES)
     {
-	  SetButtonValue(3,1,1);
+			//SetButtonValue(3,1,1);
+			 __HAL_TIM_SET_AUTORELOAD(&htim1,360-1);
     }
   }
   /* USER CODE END 3 */

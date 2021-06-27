@@ -114,6 +114,8 @@ void Error_Handler(void);
 #define LCD_CS_GPIO_Port GPIOC
 #define LED0_Pin GPIO_PIN_8
 #define LED0_GPIO_Port GPIOA
+#define PWM_Pin GPIO_PIN_11
+#define PWM_GPIO_Port GPIOA
 #define KEY1_Pin GPIO_PIN_15
 #define KEY1_GPIO_Port GPIOA
 #define LCD_BL_Pin GPIO_PIN_10
