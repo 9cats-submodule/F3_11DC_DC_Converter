@@ -9,14 +9,16 @@
 #include "stm32f1xx_hal.h"
 #include "base.h"
 
+#include "tim.h"
+
 extern float goodAmp[2];
+uint8 cmd_buffer[CMD_MAX_SIZE]; //指令缓存
+
 /*! 
  *  \brief  消息处理流程
  *  \param msg 待处理消息
  *  \param size 消息长度
  */
-
-uint8 cmd_buffer[CMD_MAX_SIZE]; //指令缓存
 
 void ProcessMessage(PCTRL_MSG msg, uint16 size)
 {
@@ -149,6 +151,19 @@ void NotifyTouchXY(uint8 press, uint16 x, uint16 y, void *userdata)
  */
 void NotifyButton(uint16 screen_id, uint16 control_id, uint8 state, void *userdata)
 {
+	if ((screen_id == 0) && (control_id == 40))
+	{
+		//TODO:开始
+	}
+	if ((screen_id == 0) && (control_id == 40))
+	{
+		htim1.Instance->CCR4++;
+		//htim1.Instance->PSC  =
+	}
+	if ((screen_id == 0) && (control_id == 40))
+	{
+		htim1.Instance->CCR4--;
+	}
 }
 
 /*! 
@@ -160,9 +175,6 @@ void NotifyButton(uint16 screen_id, uint16 control_id, uint8 state, void *userda
  */
 void NotifyText(uint16 screen_id, uint16 control_id, uint8 *str, void *userdata)
 {
-	if ((screen_id == 0) && (control_id == 1))
-	{
-	}
 }
 
 /*! 
