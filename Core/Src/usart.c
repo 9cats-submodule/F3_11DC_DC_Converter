@@ -128,9 +128,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
      huart1.RxState = HAL_UART_STATE_READY;
      __HAL_UNLOCK(&huart1);
      queue_push(RxBuffer);
-     // Param_Update();//中断里面处理完指令
-     SendChar(RxBuffer);
-		 HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
+     Param_Update();//中断里面处理完指令
+     HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
   }
 }
 /* USER CODE END 1 */

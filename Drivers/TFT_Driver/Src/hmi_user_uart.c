@@ -53,7 +53,7 @@ void Param_Update(void) //获取当前新参数
     if(size)
     {
         ProcessMessage((PCTRL_MSG)cmd_buffer, size);//指令处理
-        //LED1_T;
+        LED0_T;
     }
 }
 /*****************************************************************

@@ -18,8 +18,7 @@
 * 出口参数： 无
 ****************************************************************************/
 void TFT_Init(void);
-void UartInit(uint32 Baudrate);
-void Uart2Init(uint32 Baudrate);
+void Param_Update(void);
 /*****************************************************************
 * 名    称： SendChar()
 * 功    能： 发送1个字节

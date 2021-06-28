@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include "stm32f1xx_hal_tim.h"
 
+#include "base.h"
 #include "lcd.h"
 #include "touch.h"
 #include "w25qxx.h"
@@ -74,7 +75,7 @@ u8 A;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-    u8 key;
+  u8 key;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
