@@ -11,7 +11,7 @@ typedef struct _QUEUE
 	qdata _data[QUEUE_MAX_SIZE];	//队列数据缓存区
 }QUEUE;
 
-static QUEUE que = {0,0,0,0};  //指令队列
+static QUEUE que = {0};  //指令队列
 static uint32 cmd_state = 0;  //队列帧尾检测状态
 static qsize cmd_pos = 0;  //当前指令指针位置
 

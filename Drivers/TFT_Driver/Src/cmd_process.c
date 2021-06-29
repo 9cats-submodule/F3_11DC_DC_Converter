@@ -12,6 +12,7 @@
 #include "tim.h"
 
 extern float goodAmp[2];
+extern u8 mode;
 uint8 cmd_buffer[CMD_MAX_SIZE]; //指令缓存
 
 /*! 
@@ -151,18 +152,16 @@ void NotifyTouchXY(uint8 press, uint16 x, uint16 y, void *userdata)
  */
 void NotifyButton(uint16 screen_id, uint16 control_id, uint8 state, void *userdata)
 {
-	if ((screen_id == 0) && (control_id == 40))
+	if ((screen_id == 0) && (control_id == 20))
 	{
-		//TODO:开始
-	}
-	if ((screen_id == 0) && (control_id == 40))
-	{
-		htim1.Instance->CCR4++;
-		//htim1.Instance->PSC  =
-	}
-	if ((screen_id == 0) && (control_id == 40))
-	{
-		htim1.Instance->CCR4--;
+		if(state == 1)
+		{
+			mode = 0;
+		}
+		else
+		{
+			mode = 1;
+		}
 	}
 }
 
@@ -197,6 +196,23 @@ void NotifyProgress(uint16 screen_id, uint16 control_id, uint32 value, void *use
  */
 void NotifySlider(uint16 screen_id, uint16 control_id, uint32 value, void *userdata)
 {
+	//滚动条 -> TFT 改变 进度条 和 显示的值
+	//       -> STM32 改变PWM占空比
+	if(mode)
+	{
+		if ((screen_id == 0) && (control_id == 3))
+		{
+			u32 ARR      = htim1.Instance->ARR;
+			u32 Next_CCR = value * ARR /100;
+			u8 str[20]  = {0};
+
+			sprintf((char*)str,"%3ld / %3ld = %5.2f%%", Next_CCR, ARR, (Next_CCR+1)*100.0/(ARR+1));
+			SetProgressValue(0, 2, value);
+			SetTextValue(0,34,str);
+			__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_4,Next_CCR);
+			//__HAL_TIM_SET_AUTORELOAD(&htim1,Next_CCR);
+		}
+	}
 }
 
 /*! 

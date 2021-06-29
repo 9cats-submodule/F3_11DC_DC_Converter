@@ -27,11 +27,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stm32f1xx_hal_tim.h"
-
 #include "base.h"
 #include "hmi_user_uart.h"
 #include "hmi_driver.h"
+
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,7 +64,11 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 u8 A;
-u16 val[6];
+u16 val[3];
+u8 str[40] = {0};
+u8 mode = 1;
+//float vcc = 3.2671f;
+float vcc = 3.3f;
 /* USER CODE END 0 */
 
 /**
@@ -99,12 +103,13 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM1_Init();
   MX_ADC1_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   delay_init(72);
   TFT_Init();
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-
   HAL_ADC_Start_DMA(&hadc1, (u32*)val, 3);
+  __HAL_ADC_ENABLE_IT(&hadc1, ADC_IT_EOC);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -114,6 +119,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+
+	delay_ms(10);
+	sprintf((char *)str,"v1:%4d,v2:%4d,v3:%4d\r\n",val[0], val[1], val[2]);
+	HAL_UART_Transmit_IT(&huart3, str,40);
+	/*
     delay_ms(50);
     key = KEY_Scan(0);
     if(key == KEY0_PRES)
@@ -126,6 +137,7 @@ int main(void)
 			//SetButtonValue(3,1,1);
 			 __HAL_TIM_SET_AUTORELOAD(&htim1,360-1);
     }
+    */
   }
   /* USER CODE END 3 */
 }

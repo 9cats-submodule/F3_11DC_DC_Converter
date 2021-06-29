@@ -23,6 +23,10 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "hmi_driver.h"
+
+#include "stdio.h"
+#include "pid.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,12 +56,14 @@
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern float vcc;
+extern u16 val[];
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
 extern ADC_HandleTypeDef hadc1;
 extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart3;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -203,14 +209,40 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles ADC1 and ADC2 global interrupts.
   */
+u16 VAL_ARR[2000];
 void ADC1_2_IRQHandler(void)
 {
   /* USER CODE BEGIN ADC1_2_IRQn 0 */
-
+  static u16 i = 0;
+  static u16 j = 0;
+  u8 str[25] = {0};
   /* USER CODE END ADC1_2_IRQn 0 */
   HAL_ADC_IRQHandler(&hadc1);
   /* USER CODE BEGIN ADC1_2_IRQn 1 */
-
+  if(i%3 == 0)
+  {
+	PID.samplingVol = val[0]*vcc/4096;
+	if(j<2000)
+	{
+		VAL_ARR[j++] = val[0];
+	}
+  }
+  if(i == 900)
+  {
+  	sprintf((char *)str,"%4d      %5.4f",val[0],val[0]*vcc/4096);
+  	SetTextValue(0,31,str);
+  }
+  if(i == 901)
+  {
+  	sprintf((char *)str,"%4d      %5.4f",val[1],val[1]*vcc/4096);
+  	SetTextValue(0,32,str);
+  }
+  if(i++ == 902)
+  {
+  	sprintf((char *)str,"%4d      %5.4f",val[2],val[2]*vcc/4096);
+  	SetTextValue(0,33,str);
+  	i=0;
+  }
   /* USER CODE END ADC1_2_IRQn 1 */
 }
 
@@ -228,7 +260,20 @@ void USART1_IRQHandler(void)
   /* USER CODE END USART1_IRQn 1 */
 }
 
-/* USER CODE BEGIN 1 */
+/**
+  * @brief This function handles USART3 global interrupt.
+  */
+void USART3_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART3_IRQn 0 */
 
+  /* USER CODE END USART3_IRQn 0 */
+  HAL_UART_IRQHandler(&huart3);
+  /* USER CODE BEGIN USART3_IRQn 1 */
+
+  /* USER CODE END USART3_IRQn 1 */
+}
+
+/* USER CODE BEGIN 1 */
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
