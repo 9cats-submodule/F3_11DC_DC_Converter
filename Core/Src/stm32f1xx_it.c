@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "hmi_driver.h"
+#include "dac.h"
 
 #include "stdio.h"
 #include "pid.h"
@@ -209,7 +210,9 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles ADC1 and ADC2 global interrupts.
   */
-u16 VAL_ARR[2000];
+u16 VAL_ARR[2000]={0};
+extern u8 pid_start;
+float vt = 2.0f;
 void ADC1_2_IRQHandler(void)
 {
   /* USER CODE BEGIN ADC1_2_IRQn 0 */
@@ -219,9 +222,10 @@ void ADC1_2_IRQHandler(void)
   /* USER CODE END ADC1_2_IRQn 0 */
   HAL_ADC_IRQHandler(&hadc1);
   /* USER CODE BEGIN ADC1_2_IRQn 1 */
-  if(i%3 == 0)
+  if(i%9 == 0 && pid_start)
   {
-	PID.samplingVol = val[0]*vcc/4096;
+	PID.samplingVol      = val[0]*vcc/4096;
+	hdac.Instance->DHR12L1 = PID_Realize(vt)*4096/vcc;
 	if(j<2000)
 	{
 		VAL_ARR[j++] = val[0];

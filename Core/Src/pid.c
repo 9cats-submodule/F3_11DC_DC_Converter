@@ -1,7 +1,11 @@
 #include "base.h"
 #include "pid.h"
 
-float vcc = 12.0f;
+//float vcc = 12.0f;
+//
+//   vol = (u16)2.0*4096/3.3
+//
+S_PID PID;
 
 void PID_Init(float Kp,float Kd,float Ki) 
 {
@@ -29,7 +33,7 @@ float PID_Realize(float vol)
 
 	PID.err_last = PID.err;
 
-    return PID.voltage;
+  return PID.voltage;
 }
 
 //  ARR = PID.voltage/vold(π©µÁµÁ—π) * ARR;

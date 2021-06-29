@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dac.h"
 #include "dma.h"
 #include "tim.h"
 #include "usart.h"
@@ -32,6 +33,7 @@
 #include "hmi_driver.h"
 
 #include "stdio.h"
+#include "pid.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,6 +69,7 @@ u8 A;
 u16 val[3];
 u8 str[40] = {0};
 u8 mode = 1;
+u8 pid_start = 0;
 //float vcc = 3.2671f;
 float vcc = 3.3f;
 /* USER CODE END 0 */
@@ -104,10 +107,14 @@ int main(void)
   MX_TIM1_Init();
   MX_ADC1_Init();
   MX_USART3_UART_Init();
+  MX_DAC_Init();
   /* USER CODE BEGIN 2 */
   delay_init(72);
   TFT_Init();
+	PID_Init(2,1,1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+  HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
+	hdac.Instance->DHR12L1 = 1024;
   HAL_ADC_Start_DMA(&hadc1, (u32*)val, 3);
   __HAL_ADC_ENABLE_IT(&hadc1, ADC_IT_EOC);
   /* USER CODE END 2 */
