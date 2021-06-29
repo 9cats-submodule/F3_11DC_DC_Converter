@@ -104,7 +104,7 @@ int main(void)
   TFT_Init();
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 
-  HAL_ADC_Start_DMA(&hadc1, (u32*)val, 6);
+  HAL_ADC_Start_DMA(&hadc1, (u32*)val, 3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
