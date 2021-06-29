@@ -19,7 +19,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "spi.h"
+#include "adc.h"
+#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -29,9 +30,6 @@
 #include "stm32f1xx_hal_tim.h"
 
 #include "base.h"
-#include "lcd.h"
-#include "touch.h"
-#include "w25qxx.h"
 #include "hmi_user_uart.h"
 #include "hmi_driver.h"
 /* USER CODE END Includes */
@@ -66,6 +64,7 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 u8 A;
+u16 val[6];
 /* USER CODE END 0 */
 
 /**
@@ -96,16 +95,16 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_SPI1_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_TIM1_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   delay_init(72);
-  LCD_Init();
-  font_init();
-  tp_dev.init();
   TFT_Init();
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+
+  HAL_ADC_Start_DMA(&hadc1, (u32*)val, 6);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -139,6 +138,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -164,6 +164,12 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }

@@ -13,7 +13,7 @@ struct {
 } PID;
 
 
-void PID_Init(void);
+void PID_Init(float Kp,float Kd,float Ki);
 float PID_Realize(float vol);
 
 
