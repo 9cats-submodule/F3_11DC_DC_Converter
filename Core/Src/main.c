@@ -65,13 +65,12 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-u8 A;
 u16 val[3];
 u8 str[40] = {0};
-u8 mode = 1;
-u8 pid_start = 0;
-//float vcc = 3.2671f;
-float vcc = 3.3f;
+u8 mode = 0,next_mode=0;  //0:开环 1:稳压 2:稳压 3:放电 4:预备较准 5:放电判断
+u8 autoMode = 0; 		  //自动适应
+u8 OK = 0;				  //没有OK
+float vcc = 3.29999971f;//3.29999971
 /* USER CODE END 0 */
 
 /**
@@ -111,12 +110,13 @@ int main(void)
   /* USER CODE BEGIN 2 */
   delay_init(72);
   TFT_Init();
-	PID_Init(2,1,1);
+  PID_Init(30,10,50,100);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
   HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
-	hdac.Instance->DHR12L1 = 1024;
+  hdac.Instance->DHR12L1 = 1024;
   HAL_ADC_Start_DMA(&hadc1, (u32*)val, 3);
   __HAL_ADC_ENABLE_IT(&hadc1, ADC_IT_EOC);
+  TIM1->CCR4 = 2100;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -126,25 +126,73 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-
+	// 10V 占空比最高
+	//pid.limit
+	//
 	delay_ms(10);
 	sprintf((char *)str,"v1:%4d,v2:%4d,v3:%4d\r\n",val[0], val[1], val[2]);
 	HAL_UART_Transmit_IT(&huart3, str,40);
-	/*
+
     delay_ms(50);
     key = KEY_Scan(0);
     if(key == KEY0_PRES)
     {
-			//SetButtonValue(3,1,0);
-			 __HAL_TIM_SET_AUTORELOAD(&htim1,720-1);
+    	next_mode = 1;
     }
     if(key == KEY1_PRES)
     {
-			//SetButtonValue(3,1,1);
-			 __HAL_TIM_SET_AUTORELOAD(&htim1,360-1);
+    	next_mode = 2;
     }
-    */
+
+	if(next_mode != mode)
+	{
+		switch(next_mode)
+		{
+			case 0:
+			{
+  			  	SetTextValue(0,21,(u8*)"开环");
+				TIM1->CCR4 = 2100;
+			}
+			case 1/*稳流*/:
+			{
+  			  	SetTextValue(0,21,(u8*)"稳流");
+  			  	if(mode = 2)
+  			  	{
+  			  		PID.Kd = 10;
+  			  		PID.Ki = 10;
+  			  		PID.Kp = 10;
+  			  	}
+				TIM1->CCR4 = 2100;
+			}break;
+			case 2/*稳压*/:
+			{
+  			  	SetTextValue(0,21,(u8*)"稳压");
+  			  	if(mode = 2)
+  			  	{
+  			  		PID.Kd = 30;
+  			  		PID.Ki = 40;
+  			  		PID.Kp = 50;
+  			  	}
+				TIM1->CCR4 = 2100;
+			}break;
+			case 3/*放电*/:
+			{
+  			  	SetTextValue(0,21,(u8*)"放电");
+				PID_Init(-30,-40,-50,70);
+				TIM1->CCR4 = 2100;
+			}break;
+			case 4/**/:
+			{
+  			  	SetTextValue(0,21,(u8*)"未接负载");
+			}
+			case 8/*稳压-充电完毕*/:
+			{
+  			  	SetTextValue(0,21,(u8*)"充电完毕");
+			}break;
+		}
+		if(next_mode == 8) mode = 2;
+		else mode = next_mode;
+	}
   }
   /* USER CODE END 3 */
 }

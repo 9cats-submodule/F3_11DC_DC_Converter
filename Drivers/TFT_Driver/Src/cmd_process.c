@@ -12,7 +12,8 @@
 #include "tim.h"
 
 extern float goodAmp[2];
-extern u8 mode;
+extern u8 mode,autoMode,OK;
+extern u16 i,j;
 uint8 cmd_buffer[CMD_MAX_SIZE]; //指令缓存
 
 /*! 
@@ -62,7 +63,7 @@ void ProcessMessage(PCTRL_MSG msg, uint16 size)
 			switch (control_type)
 			{
 			case kCtrlButton: //按钮控件
-				NotifyButton(screen_id, control_id, msg->param[0], NULL);
+				NotifyButton(screen_id, control_id, msg->param[1], NULL);
 				break;
 			case kCtrlText: //文本控件
 				NotifyText(screen_id, control_id, msg->param, NULL);
@@ -150,17 +151,46 @@ void NotifyTouchXY(uint8 press, uint16 x, uint16 y, void *userdata)
  *  \param control_id 控件ID
  *  \param state 按钮状态：0弹起，1按下
  */
+extern u8 next_mode;
 void NotifyButton(uint16 screen_id, uint16 control_id, uint8 state, void *userdata)
 {
 	if ((screen_id == 0) && (control_id == 20))
 	{
 		if(state == 1)
 		{
-			mode = 0;
+			next_mode = 1;
+			autoMode = 1;
+			OK = 0;
 		}
 		else
 		{
-			mode = 1;
+			next_mode = mode = i =  j = 0;
+			autoMode = 0;
+			OK = 0;
+		}
+	}
+	if ((screen_id == 0) && (control_id == 24))
+	{
+		if(state == 1)
+		{
+			next_mode = 1;
+			OK = 0;
+		}
+	}
+	if ((screen_id == 0) && (control_id == 25))
+	{
+		if(state == 1)
+		{
+			next_mode = 2;
+			OK = 0;
+		}
+	}
+	if ((screen_id == 0) && (control_id == 26))
+	{
+		if(state == 1)
+		{
+			next_mode = 3;
+			OK = 0;
 		}
 	}
 }
@@ -198,7 +228,7 @@ void NotifySlider(uint16 screen_id, uint16 control_id, uint32 value, void *userd
 {
 	//滚动条 -> TFT 改变 进度条 和 显示的值
 	//       -> STM32 改变PWM占空比
-	if(mode)
+	if(!mode)
 	{
 		if ((screen_id == 0) && (control_id == 3))
 		{
@@ -209,7 +239,7 @@ void NotifySlider(uint16 screen_id, uint16 control_id, uint32 value, void *userd
 			sprintf((char*)str,"%3ld / %3ld = %5.2f%%", Next_CCR, ARR, (Next_CCR+1)*100.0/(ARR+1));
 			SetProgressValue(0, 2, value);
 			SetTextValue(0,34,str);
-			__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_4,Next_CCR);
+			__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_4,Next_CCR+1);
 			//__HAL_TIM_SET_AUTORELOAD(&htim1,Next_CCR);
 		}
 	}
